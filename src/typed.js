@@ -131,9 +131,7 @@ export default class Typed {
       let pauseTime = 0;
       let substr = curString.substr(curStrPos);
       // check for an escape character before a pause value
-      // format: \^\d+ .. eg: ^1000 .. should be able to print the ^ too using ^^
-      // single ^ are removed from string
-      console.log(curStrPos, substr);
+      // format: \{pause:\d+\} .. eg: {pause:1000}
       if (
         substr.charAt(0) === '{' &&
         substr.charAt(1) === 'p' &&
@@ -143,15 +141,13 @@ export default class Typed {
         substr.charAt(5) === 'e' &&
         substr.charAt(6) === ':'
       ) {
-        if (/^\{pause:(\d+)}/.test(substr)) {
+        if (/^\{pause:(\d+)\}/.test(substr)) {
           let skip = 1; // skip at least 1
-          substr = /\{pause:(\d+)}/.exec(substr)[0];
+          substr = /\{pause:(\d+)\}/.exec(substr)[0];
           skip += substr.length;
-          pauseTime = parseInt(substr.replace(/\{pause:(\d+)}/, '$1'));
-          
+          pauseTime = parseInt(substr.replace(/\{pause:(\d+)\}/, '$1'));
           this.temporaryPause = true;
           this.options.onTypingPaused(this.arrayPos, this);
-          
           // strip out the escape character and pause value so they're not printed
           curString =
             curString.substring(0, curStrPos) +
