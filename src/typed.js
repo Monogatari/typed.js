@@ -13,6 +13,8 @@ export default class Typed {
     initializer.load(this, options, elementId);
     // All systems go!
     this.begin();
+
+    this.inlineSpeed = this.typeSpeed;
   }
 
   /**
@@ -115,7 +117,7 @@ export default class Typed {
       if (this.cursor) this.cursor.classList.remove(this.fadeOutClass);
     }
 
-    const humanize = this.humanizer(this.typeSpeed);
+    const humanize = this.humanizer(this.inlineSpeed);
     let numChars = 1;
 
     if (this.pause.status === true) {
@@ -153,6 +155,30 @@ export default class Typed {
             curString.substring(0, curStrPos) +
             curString.substring(curStrPos + skip);
           this.toggleBlinking(true);
+        }
+      }
+
+      if (
+        substr.charAt(0) === '{' &&
+        substr.charAt(1) === 's' &&
+        substr.charAt(2) === 'p' &&
+        substr.charAt(3) === 'e' &&
+        substr.charAt(4) === 'e' &&
+        substr.charAt(5) === 'd' &&
+        substr.charAt(6) === ':'
+      ) {
+        if (/^\{speed:(\d+)\}/.test(substr)) {
+          let skip = 1; // skip at least 1
+          substr = /\{speed:(\d+)\}/.exec(substr)[0];
+          skip += substr.length;
+          const percentage = parseInt(substr.replace(/\{speed:(\d+)\}/, '$1'));
+          const calculatedSpeed = Math.floor((this.typeSpeed * 100) / percentage);
+          this.inlineSpeed =  calculatedSpeed > 0 ? calculatedSpeed : 0;
+
+          // strip out the escape character and pause value so they're not printed
+          curString =
+            curString.substring(0, curStrPos) +
+            curString.substring(curStrPos + skip);
         }
       }
 
